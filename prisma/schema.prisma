@@ -1,0 +1,42 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Project {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  location    String
+  totalFloors Int
+  createdAt   DateTime @default(now())
+  floors      Floor[]
+  analysis    Analysis?
+}
+
+model Floor {
+  id         String  @id @default(auto()) @map("_id") @db.ObjectId
+  floorNumber Int
+  length     Float
+  width      Float
+  height     Float
+  projectId  String  @db.ObjectId
+  project    Project @relation(fields: [projectId], references: [id])
+}
+
+model Analysis {
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  projectId         String   @unique @db.ObjectId
+  project           Project  @relation(fields: [projectId], references: [id])
+  optimalPanels     Int
+  currentInventory  Int
+  costSaved         Float
+  repetitionScore   Float
+  kittingSchedule   Json
+  repetitionGroups Json?
+  aiSuggestions     String
+  createdAt         DateTime @default(now())
+}
